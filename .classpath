@@ -6,6 +6,7 @@
 	<classpathentry kind="src" path="PaymentDetails_Src"/>
 	<classpathentry kind="src" path="EmployeeDetails_Src"/>
 	<classpathentry kind="src" path="AirportDetails_Src"/>
+	<classpathentry kind="src" path="ScheduleDetails_Src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="D:/Installed Software/Postgresql/pgJDBC/postgresql-42.2.18.jar"/>
 	<classpathentry kind="lib" path="C:/Users/adhit/Desktop/tobelcleansed/tmp/jcalendar-1.4/lib/jcalendar-1.4.jar"/>
