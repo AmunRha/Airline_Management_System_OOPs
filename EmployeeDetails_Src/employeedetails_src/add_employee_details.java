@@ -33,7 +33,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.awt.event.ActionEvent;
 import JDBCMisc_pkg.JDBC_Creds;
-public class employee_details extends JFrame implements JDBC_Creds  {
+public class add_employee_details extends JFrame implements JDBC_Creds  {
 	private JFrame frame;
 	private JTextField textField;
 	private JLabel Name_passenger;
@@ -102,7 +102,7 @@ public class employee_details extends JFrame implements JDBC_Creds  {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					passenger_details window = new passenger_details();
+					add_employee_details window = new add_employee_details();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -115,7 +115,7 @@ public class employee_details extends JFrame implements JDBC_Creds  {
 	/**
 	 * Create the application.
 	 */
-	public passenger_details() {
+	public add_employee_details() {
 		initialize();
 	}
 
