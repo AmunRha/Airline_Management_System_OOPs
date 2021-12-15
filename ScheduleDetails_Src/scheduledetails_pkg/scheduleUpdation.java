@@ -1,3 +1,4 @@
+package scheduledetails_pkg;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
