@@ -40,7 +40,7 @@ public class LoginPage extends JFrame {
 	}
     
     public LoginPage() {
-        setLayout(null);
+        getContentPane().setLayout(null);
         this.setBackground(Color.decode(pageThemeColor));
 
         Font buttonFont = new Font("Consolas",Font.PLAIN,16);
@@ -52,16 +52,16 @@ public class LoginPage extends JFrame {
         pageTitle.setText("Welcome to Amrita Tours and Travels !");
         pageTitle.setBounds(12, 10, 579, 88);
         pageTitle.setBackground(Color.decode(pageThemeColor));
-        add(pageTitle);
+        getContentPane().add(pageTitle);
         pageTitle.setColumns(10);
 
         JLabel lblNewLabel = new JLabel(image);
         lblNewLabel.setBounds(419, 10, 134, 88);
-        add(lblNewLabel);
+        getContentPane().add(lblNewLabel);
 
         JPanel loginOptionPanel = new JPanel();
         loginOptionPanel.setBounds(120, 168, 343, 276);
-        add(loginOptionPanel);
+        getContentPane().add(loginOptionPanel);
         loginOptionPanel.setLayout(null);
 
         txtChooseLoginOption = new JTextField();
@@ -72,29 +72,29 @@ public class LoginPage extends JFrame {
         loginOptionPanel.add(txtChooseLoginOption);
         txtChooseLoginOption.setColumns(10);
 
-        JButton userButton = new JButton("User");
-        userButton.addActionListener(new ActionListener() {
+        JButton signup = new JButton("Sign Up");
+        signup.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		System.out.println("Register new user clicked");
         		RegisterPage r = new RegisterPage();
         		r.runRegisterPage();
         	}
         });
-        userButton.setFocusPainted(false);
-        userButton.setFont(buttonFont);
-        userButton.setBounds(10, 58, 133, 27);
-        loginOptionPanel.add(userButton);
+        signup.setFocusPainted(false);
+        signup.setFont(buttonFont);
+        signup.setBounds(10, 58, 133, 27);
+        loginOptionPanel.add(signup);
         //loginOptionPanel.setBackground(Color.decode(pageThemeColor));
 
-        JButton adminButton = new JButton("Administrator");
-        adminButton.setFocusPainted(false);
-        adminButton.addActionListener(new ActionListener() {
+        JButton signin = new JButton("Sign In");
+        signin.setFocusPainted(false);
+        signin.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             }
         });
-        adminButton.setFont(buttonFont);
-        adminButton.setBounds(153, 58, 180, 27);
-        loginOptionPanel.add(adminButton);
+        signin.setFont(buttonFont);
+        signin.setBounds(153, 58, 180, 27);
+        loginOptionPanel.add(signin);
 
 
     }

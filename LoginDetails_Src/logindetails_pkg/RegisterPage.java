@@ -86,6 +86,19 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
 					return -2;
 				}
 				
+				st = connection.prepareStatement("SELECT count(*) from Passenger_Details WHERE Username = ?");
+				st.setString(1, p.getUsername());
+				rs = st.executeQuery();
+				
+				if(rs.next()) {
+					count = rs.getInt(1);
+				}
+				
+				if(count != 0) {
+					System.out.println("Value already in table");
+					return -3;
+				}
+				
 				st = connection.prepareStatement("insert into Passenger_Details values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 				st.setString(1, p.getName());
 				st.setInt(2, p.getAge());
@@ -408,9 +421,13 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
             	int res = addPassengerDetails(p);
             	if (res == 1) {
             		txtEnterYourDetails.setText("Values inserted successfully!");
+            		System.out.println("Values inserted into the DB successfully!");
 				}
 				else if(res == -2) {
-					txtEnterYourDetails.setText("Value Exists, please enter another value");
+					txtEnterYourDetails.setText("Passport No exists, please enter another value");
+				}
+				else if(res == -3) {
+					txtEnterYourDetails.setText("Username exists, please enter another username");
 				}
             }
         }
