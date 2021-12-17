@@ -58,7 +58,7 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
     private JTextField txtrPassportNo;
     
     
-	private int addPassengerDetails(Passenger_DetailsDB al) {
+	private int addPassengerDetails(Passenger_DetailsDB p) {
 		PreparedStatement st;
 		ResultSet rs;
 		int count = 0;
@@ -73,7 +73,7 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
 			
 			try {
 				st = connection.prepareStatement("SELECT count(*) from Passenger_Details WHERE PassportNo = ?");
-				st.setString(1, al.getPassportNo());
+				st.setString(1, p.getPassportNo());
 				rs = st.executeQuery();
 				
 				if(rs.next()) {
@@ -85,12 +85,18 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
 					return -2;
 				}
 				
-				st = connection.prepareStatement("insert into Airline_Details values (?, ?, ?, ?, ?)");
-				st.setInt(1, al.getAirlineNo());
-				st.setString(2, al.getAirlineName());
-				st.setString(3, al.getAirlineType());
-				st.setInt(4, al.getSeatingCapacity());
-				st.setDouble(5, al.getPrice());
+				st = connection.prepareStatement("insert into Airline_Details values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				st.setString(1, p.getName());
+				st.setInt(2, p.getAge());
+				st.setString(3, p.getPassportNo());
+				st.setInt(4, p.getDisabled());
+				st.setString(5, p.getEmailID());
+				st.setString(6, p.getPhoneNo());
+				st.setString(7, p.getUsername());
+				st.setString(8, p.getPassword());
+				st.setString(9, p.getCardNumber());
+				st.setString(10, p.getCardType());
+				st.setInt(11, p.getIsAdmin());
 				st.execute();
 				return 1;
 			}
@@ -106,6 +112,11 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
 		}	
 		System.out.println("Connection to DB closed!");
 		return 0;
+	}
+	
+	private int isDisabled(String dis) {
+		if (dis.equalsIgnoreCase("YES")) return 1;
+		else return 0;
 	}
     
     /**
@@ -357,6 +368,7 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
         add(submitButton);
 
     }
+    
 
     public void actionPerformed(ActionEvent e){
         if(e.getSource()==submitButton){
@@ -374,11 +386,11 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
             	String cardno = textcardNumber.getText();
             	String cardtype = textcardType.getText();
             	int age = Integer.parseInt(ageComboBox.getSelectedItem().toString());
-            	int dis = (disabledComboBox.getSelectedItem().toString());
+            	int dis = isDisabled(disabledComboBox.getSelectedItem().toString());
             	
             	
-            	Passenger_DetailsDB p = new Passenger_DetailsDB(name, nat, passport, emailID, phoneNo, username, password, cardno, cardtype, age, 0, );
-            	addPassengerDetails(null);
+            	Passenger_DetailsDB p = new Passenger_DetailsDB(name, nat, passport, emailID, phoneNo, username, password, cardno, cardtype, age, 0, dis);
+            	addPassengerDetails(p);
             }
         }
     }
