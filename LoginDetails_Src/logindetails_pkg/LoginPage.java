@@ -1,18 +1,22 @@
 package logindetails_pkg;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-public class LoginPage extends JPanel {
+import airlinedetails_pkg.AddAirlineDetails;
+
+public class LoginPage extends JFrame {
     private JTextField pageTitle;
     ImageIcon image = new ImageIcon("airplane_pic.png");
     private JTextField txtChooseLoginOption;
@@ -20,6 +24,21 @@ public class LoginPage extends JPanel {
     /**
      * Create the panel.
      */
+    
+    public void runLoginPage() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					LoginPage frame = new LoginPage();
+					frame.setSize(600,600);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+    
     public LoginPage() {
         setLayout(null);
         this.setBackground(Color.decode(pageThemeColor));
@@ -54,6 +73,13 @@ public class LoginPage extends JPanel {
         txtChooseLoginOption.setColumns(10);
 
         JButton userButton = new JButton("User");
+        userButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		System.out.println("Register new user clicked");
+        		RegisterPage r = new RegisterPage();
+        		r.runRegisterPage();
+        	}
+        });
         userButton.setFocusPainted(false);
         userButton.setFont(buttonFont);
         userButton.setBounds(10, 58, 133, 27);

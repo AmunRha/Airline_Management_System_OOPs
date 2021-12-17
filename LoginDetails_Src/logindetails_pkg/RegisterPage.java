@@ -1,6 +1,7 @@
 package logindetails_pkg;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -14,18 +15,20 @@ import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import airlinedetails_pkg.AddAirlineDetails;
 import airlinedetails_pkg.Airline_DetailsDB;
 import java.awt.SystemColor;
 import JDBCMisc_pkg.JDBC_Creds;
 import javax.swing.DefaultComboBoxModel;
 
-public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
+public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
     private JTextField panelTitle;
     private JTextField txtEnterYourDetails;
     private JTextField txtAge;
@@ -117,6 +120,20 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
 	private int isDisabled(String dis) {
 		if (dis.equalsIgnoreCase("YES")) return 1;
 		else return 0;
+	}
+	
+	public void runRegisterPage() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					RegisterPage frame = new RegisterPage();
+					frame.setSize(600, 600);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
     
     /**
@@ -366,7 +383,6 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
         submitButton.setFont(new Font("Tahoma", Font.PLAIN, 18));
         submitButton.setBounds(359, 705, 106, 29);
         add(submitButton);
-
     }
     
 
@@ -390,7 +406,13 @@ public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
             	
             	
             	Passenger_DetailsDB p = new Passenger_DetailsDB(name, nat, passport, emailID, phoneNo, username, password, cardno, cardtype, age, 0, dis);
-            	addPassengerDetails(p);
+            	int res = addPassengerDetails(p);
+            	if (res == 1) {
+            		txtEnterYourDetails.setText("Values inserted successfully!");
+				}
+				else if(res == -2) {
+					txtEnterYourDetails.setText("Value Exists, please enter another value");
+				}
             }
         }
     }
