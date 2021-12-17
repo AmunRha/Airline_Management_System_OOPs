@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -13,20 +14,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import airlinedetails_pkg.AddAirlineDetails;
-import airlinedetails_pkg.Airline_DetailsDB;
-import java.awt.SystemColor;
 import JDBCMisc_pkg.JDBC_Creds;
-import javax.swing.DefaultComboBoxModel;
 
 public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
     private JTextField panelTitle;
@@ -51,7 +48,7 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
     private String pageThemeColor = "#7CD1B8";
     private JTextField hr;
     private JButton submitButton;
-    String firstName,lastName,email,nationality,isDisabled,age,username,password,confirmPassword,phno;
+    String firstName,lastName,email,nationality,isDisabled,age,username,userpassword,confirmPassword,phno;
     private JTextField txtCardNo;
     private JTextField textcardNumber;
     private JTextField textField_2;
@@ -65,6 +62,7 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
 		PreparedStatement st;
 		ResultSet rs;
 		int count = 0;
+		System.out.println("Connecting to the DB!");
 		try(Connection connection = DriverManager.getConnection(url, user, password);){
 			if(connection != null) {
 				System.out.println("Connected to PostgreSQL!");
@@ -88,18 +86,19 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
 					return -2;
 				}
 				
-				st = connection.prepareStatement("insert into Airline_Details values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				st = connection.prepareStatement("insert into Passenger_Details values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 				st.setString(1, p.getName());
 				st.setInt(2, p.getAge());
-				st.setString(3, p.getPassportNo());
-				st.setInt(4, p.getDisabled());
-				st.setString(5, p.getEmailID());
-				st.setString(6, p.getPhoneNo());
-				st.setString(7, p.getUsername());
-				st.setString(8, p.getPassword());
-				st.setString(9, p.getCardNumber());
-				st.setString(10, p.getCardType());
-				st.setInt(11, p.getIsAdmin());
+				st.setString(3, p.getNationality());
+				st.setString(4, p.getPassportNo());
+				st.setInt(5, p.getDisabled());
+				st.setString(6, p.getEmailID());
+				st.setString(7, p.getPhoneNo());
+				st.setString(8, p.getUsername());
+				st.setString(9, p.getPassword());
+				st.setString(10, p.getCardNumber());
+				st.setString(11, p.getCardType());
+				st.setInt(12, p.getIsAdmin());
 				st.execute();
 				return 1;
 			}
@@ -127,7 +126,7 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
 			public void run() {
 				try {
 					RegisterPage frame = new RegisterPage();
-					frame.setSize(600, 600);
+					frame.setSize(800, 800);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -145,7 +144,7 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
         Font registrationFont = new Font("Monospace",Font.PLAIN,16);
         Font textfieldFont = new Font("Consolas",Font.PLAIN,16);
 
-        setLayout(null);
+        getContentPane().setLayout(null);
         this.setBackground(Color.decode(pageThemeColor));
 
         panelTitle = new JTextField();
@@ -156,7 +155,7 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
         panelTitle.setFont(new Font("Calibri", Font.BOLD, 18));
         panelTitle.setText("Register Your Account: ");
         panelTitle.setBounds(12, 10, 709, 29);
-        add(panelTitle);
+        getContentPane().add(panelTitle);
         panelTitle.setColumns(10);
 
         txtEnterYourDetails = new JTextField();
@@ -165,13 +164,13 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
         txtEnterYourDetails.setEditable(false);
         txtEnterYourDetails.setFont(new Font("Bahnschrift", Font.PLAIN, 16));
         txtEnterYourDetails.setText("Enter your details:");
-        txtEnterYourDetails.setBounds(71, 62, 183, 29);
-        add(txtEnterYourDetails);
+        txtEnterYourDetails.setBounds(71, 62, 304, 29);
+        getContentPane().add(txtEnterYourDetails);
         txtEnterYourDetails.setColumns(10);
 
         JPanel registrationForm = new JPanel();
         registrationForm.setBounds(71, 104, 394, 575);
-        add(registrationForm);
+        getContentPane().add(registrationForm);
         registrationForm.setLayout(null);
 
         txtAge = new JTextField();
@@ -280,14 +279,14 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
         registrationForm.add(txtSetPassword);
         txtSetPassword.setColumns(10);
 
-        txtConfirmPassword = new JTextField();
-        txtConfirmPassword.setBorder(BorderFactory.createEmptyBorder());
-        txtConfirmPassword.setFont(new Font("Monospace",Font.PLAIN,16));
-        txtConfirmPassword.setEditable(false);
-        txtConfirmPassword.setText("Confirm password");
-        txtConfirmPassword.setBounds(10, 422, 130, 27);
-        registrationForm.add(txtConfirmPassword);
-        txtConfirmPassword.setColumns(10);
+//        txtConfirmPassword = new JTextField();
+//        txtConfirmPassword.setBorder(BorderFactory.createEmptyBorder());
+//        txtConfirmPassword.setFont(new Font("Monospace",Font.PLAIN,16));
+//        txtConfirmPassword.setEditable(false);
+//        txtConfirmPassword.setText("Confirm password");
+//        txtConfirmPassword.setBounds(10, 422, 130, 27);
+//        registrationForm.add(txtConfirmPassword);
+//        txtConfirmPassword.setColumns(10);
 
         setPasswordTextField = new JPasswordField();
         setPasswordTextField.setFont(textfieldFont);
@@ -295,11 +294,11 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
         setPasswordTextField.setBounds(170, 388, 214, 27);
         registrationForm.add(setPasswordTextField);
 
-        confirmPasswordTextField = new JPasswordField();
-        confirmPasswordTextField.setFont(textfieldFont);
-        confirmPasswordTextField.setMargin(inset);
-        confirmPasswordTextField.setBounds(170, 425, 214, 27);
-        registrationForm.add(confirmPasswordTextField);
+//        confirmPasswordTextField = new JPasswordField();
+//        confirmPasswordTextField.setFont(textfieldFont);
+//        confirmPasswordTextField.setMargin(inset);
+//        confirmPasswordTextField.setBounds(170, 425, 214, 27);
+//        registrationForm.add(confirmPasswordTextField);
 
         setUsernameTextField = new JTextField();
         setUsernameTextField.setFont(textfieldFont);
@@ -382,19 +381,19 @@ public class RegisterPage extends JFrame implements ActionListener, JDBC_Creds{
         submitButton.setFocusPainted(false);
         submitButton.setFont(new Font("Tahoma", Font.PLAIN, 18));
         submitButton.setBounds(359, 705, 106, 29);
-        add(submitButton);
+        getContentPane().add(submitButton);
     }
     
 
     public void actionPerformed(ActionEvent e){
         if(e.getSource()==submitButton){
-            if(firstNameTextField.getText().length()<10 || ageComboBox.getSelectedItem()==null || nationalityComboBox.getSelectedItem()==null || emailIDTextField.getText()==null||phoneNoTextField.getText()==null){
+            if(firstNameTextField.getText().length()<5 || ageComboBox.getSelectedItem()==null || nationalityComboBox.getSelectedItem()==null || emailIDTextField.getText()==null||phoneNoTextField.getText()==null){
             	txtEnterYourDetails.setText("Enter every item!");
             }
             else {
             	String name = firstNameTextField.getText();
             	String nat = nationalityComboBox.getSelectedItem().toString();
-            	String passport = txtPassportNo.getText();
+            	String passport = txtrPassportNo.getText();
             	String emailID = emailIDTextField.getText();
             	String phoneNo = phoneNoTextField.getText();
             	String username = setUsernameTextField.getText();

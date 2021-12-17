@@ -20,7 +20,6 @@ public class Window extends JFrame{
 		
 		LoginPage l = new LoginPage();
 		l.runLoginPage();
-		
 	}
 
 }
