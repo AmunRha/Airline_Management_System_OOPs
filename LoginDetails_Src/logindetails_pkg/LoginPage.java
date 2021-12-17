@@ -1,9 +1,16 @@
 package logindetails_pkg;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class LoginPage extends JPanel {
     private JTextField pageTitle;
@@ -20,10 +27,11 @@ public class LoginPage extends JPanel {
         Font buttonFont = new Font("Consolas",Font.PLAIN,16);
 
         pageTitle = new JTextField();
+        pageTitle.setHorizontalAlignment(SwingConstants.CENTER);
         pageTitle.setEditable(false);
         pageTitle.setFont(new Font("Bahnschrift", Font.BOLD, 18));
         pageTitle.setText("Welcome to Amrita Tours and Travels !");
-        pageTitle.setBounds(66, 10, 343, 88);
+        pageTitle.setBounds(12, 10, 579, 88);
         pageTitle.setBackground(Color.decode(pageThemeColor));
         add(pageTitle);
         pageTitle.setColumns(10);
@@ -33,7 +41,7 @@ public class LoginPage extends JPanel {
         add(lblNewLabel);
 
         JPanel loginOptionPanel = new JPanel();
-        loginOptionPanel.setBounds(66, 129, 343, 276);
+        loginOptionPanel.setBounds(120, 168, 343, 276);
         add(loginOptionPanel);
         loginOptionPanel.setLayout(null);
 

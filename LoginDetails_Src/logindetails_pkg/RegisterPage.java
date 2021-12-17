@@ -1,11 +1,31 @@
 package logindetails_pkg;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class RegisterPage extends JPanel implements ActionListener {
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
+import airlinedetails_pkg.Airline_DetailsDB;
+import java.awt.SystemColor;
+import JDBCMisc_pkg.JDBC_Creds;
+import javax.swing.DefaultComboBoxModel;
+
+public class RegisterPage extends JPanel implements ActionListener, JDBC_Creds{
     private JTextField panelTitle;
     private JTextField txtEnterYourDetails;
     private JTextField txtAge;
@@ -15,13 +35,9 @@ public class RegisterPage extends JPanel implements ActionListener {
     private JTextField txtNationality;
     private JTextField txtPhoneNo;
     private JTextField firstNameTextField;
-    private JComboBox<String> ageComboBox;
+    private JComboBox<String> ageComboBox, disabledComboBox;
     private JComboBox<String> nationalityComboBox;
-    private JRadioButton disabledOptionNO;
-    private JRadioButton disabledOptionYES;
     private JTextField emailIDTextField;
-    private JTextField txtLastName;
-    private JTextField lastNameTextField;
     private JTextField phoneNoTextField;
     private JTextField txtSetUsername;
     private JTextField txtSetPassword;
@@ -33,7 +49,65 @@ public class RegisterPage extends JPanel implements ActionListener {
     private JTextField hr;
     private JButton submitButton;
     String firstName,lastName,email,nationality,isDisabled,age,username,password,confirmPassword,phno;
-
+    private JTextField txtCardNo;
+    private JTextField textcardNumber;
+    private JTextField textField_2;
+    private JTextField txtCardType;
+    private JTextField textcardType;
+    private JTextField txtPassportNo;
+    private JTextField txtrPassportNo;
+    
+    
+	private int addPassengerDetails(Passenger_DetailsDB al) {
+		PreparedStatement st;
+		ResultSet rs;
+		int count = 0;
+		try(Connection connection = DriverManager.getConnection(url, user, password);){
+			if(connection != null) {
+				System.out.println("Connected to PostgreSQL!");
+			}
+			else {
+				System.out.println("Failed to connect to PostgreSQL");
+				System.out.println("Something went very wrong!");
+			}
+			
+			try {
+				st = connection.prepareStatement("SELECT count(*) from Passenger_Details WHERE PassportNo = ?");
+				st.setString(1, al.getPassportNo());
+				rs = st.executeQuery();
+				
+				if(rs.next()) {
+					count = rs.getInt(1);
+				}
+				
+				if(count != 0) {
+					System.out.println("Value already in table");
+					return -2;
+				}
+				
+				st = connection.prepareStatement("insert into Airline_Details values (?, ?, ?, ?, ?)");
+				st.setInt(1, al.getAirlineNo());
+				st.setString(2, al.getAirlineName());
+				st.setString(3, al.getAirlineType());
+				st.setInt(4, al.getSeatingCapacity());
+				st.setDouble(5, al.getPrice());
+				st.execute();
+				return 1;
+			}
+			catch (SQLException e) {
+				System.out.println("Execution of Query Failed!");
+				e.printStackTrace();
+			}
+			System.out.println("Values inserted into the DB successfully!");
+			
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}	
+		System.out.println("Connection to DB closed!");
+		return 0;
+	}
+    
     /**
      * Create the panel.
      */
@@ -47,12 +121,13 @@ public class RegisterPage extends JPanel implements ActionListener {
         this.setBackground(Color.decode(pageThemeColor));
 
         panelTitle = new JTextField();
+        panelTitle.setHorizontalAlignment(SwingConstants.CENTER);
         panelTitle.setBackground(Color.decode(pageThemeColor));
         panelTitle.setBorder(BorderFactory.createEmptyBorder());
         panelTitle.setEditable(false);
         panelTitle.setFont(new Font("Calibri", Font.BOLD, 18));
         panelTitle.setText("Register Your Account: ");
-        panelTitle.setBounds(175, 10, 183, 29);
+        panelTitle.setBounds(12, 10, 709, 29);
         add(panelTitle);
         panelTitle.setColumns(10);
 
@@ -67,7 +142,7 @@ public class RegisterPage extends JPanel implements ActionListener {
         txtEnterYourDetails.setColumns(10);
 
         JPanel registrationForm = new JPanel();
-        registrationForm.setBounds(71, 101, 394, 418);
+        registrationForm.setBounds(71, 104, 394, 575);
         add(registrationForm);
         registrationForm.setLayout(null);
 
@@ -102,8 +177,8 @@ public class RegisterPage extends JPanel implements ActionListener {
         txtFirstName.setBorder(BorderFactory.createEmptyBorder());
         txtFirstName.setFont(registrationFont);
         txtFirstName.setEditable(false);
-        txtFirstName.setText("First Name:");
-        txtFirstName.setBounds(10, 0, 96, 29);
+        txtFirstName.setText("Name:");
+        txtFirstName.setBounds(10, 37, 96, 29);
         registrationForm.add(txtFirstName);
         txtFirstName.setColumns(10);
 
@@ -128,7 +203,7 @@ public class RegisterPage extends JPanel implements ActionListener {
         firstNameTextField = new JTextField();
         firstNameTextField.setFont(textfieldFont);
         firstNameTextField.setMargin(inset);
-        firstNameTextField.setBounds(116, 0, 214, 29);
+        firstNameTextField.setBounds(116, 37, 214, 29);
         registrationForm.add(firstNameTextField);
         firstNameTextField.setColumns(10);
 
@@ -145,41 +220,12 @@ public class RegisterPage extends JPanel implements ActionListener {
         nationalityComboBox.setBounds(116, 116, 161, 27);
         registrationForm.add(nationalityComboBox);
 
-        disabledOptionYES = new JRadioButton("Y");
-        disabledOptionYES.addActionListener(this);
-        disabledOptionYES.setFocusPainted(false);
-        disabledOptionYES.setBounds(116, 170, 43, 21);
-        registrationForm.add(disabledOptionYES);
-
-        disabledOptionNO = new JRadioButton("N");
-        disabledOptionNO.setSelected(true);
-        disabledOptionNO.addActionListener(this);
-        disabledOptionNO.setFocusPainted(false);
-        disabledOptionNO.setBounds(116, 148, 43, 21);
-        registrationForm.add(disabledOptionNO);
-
         emailIDTextField = new JTextField();
         emailIDTextField.setFont(textfieldFont);
         emailIDTextField.setMargin(inset);
         emailIDTextField.setBounds(116, 193, 214, 27);
         registrationForm.add(emailIDTextField);
         emailIDTextField.setColumns(10);
-
-        txtLastName = new JTextField();
-        txtLastName.setBorder(BorderFactory.createEmptyBorder());
-        txtLastName.setFont(registrationFont);
-        txtLastName.setEditable(false);
-        txtLastName.setText("Last Name");
-        txtLastName.setBounds(10, 40, 96, 29);
-        registrationForm.add(txtLastName);
-        txtLastName.setColumns(10);
-
-        lastNameTextField = new JTextField();
-        lastNameTextField.setFont(textfieldFont);
-        lastNameTextField.setMargin(inset);
-        lastNameTextField.setBounds(116, 39, 214, 30);
-        registrationForm.add(lastNameTextField);
-        lastNameTextField.setColumns(10);
 
         phoneNoTextField = new JTextField();
         phoneNoTextField.setFont(textfieldFont);
@@ -193,7 +239,7 @@ public class RegisterPage extends JPanel implements ActionListener {
         txtSetUsername.setFont(registrationFont);
         txtSetUsername.setText("Set Username:");
         txtSetUsername.setEditable(false);
-        txtSetUsername.setBounds(10, 296, 118, 27);
+        txtSetUsername.setBounds(10, 351, 118, 27);
         registrationForm.add(txtSetUsername);
         txtSetUsername.setColumns(10);
 
@@ -202,7 +248,7 @@ public class RegisterPage extends JPanel implements ActionListener {
         txtSetPassword.setFont(registrationFont);
         txtSetPassword.setText("Set Password:");
         txtSetPassword.setEditable(false);
-        txtSetPassword.setBounds(10, 333, 118, 24);
+        txtSetPassword.setBounds(10, 388, 118, 24);
         registrationForm.add(txtSetPassword);
         txtSetPassword.setColumns(10);
 
@@ -211,26 +257,26 @@ public class RegisterPage extends JPanel implements ActionListener {
         txtConfirmPassword.setFont(new Font("Monospace",Font.PLAIN,16));
         txtConfirmPassword.setEditable(false);
         txtConfirmPassword.setText("Confirm password");
-        txtConfirmPassword.setBounds(10, 367, 130, 27);
+        txtConfirmPassword.setBounds(10, 422, 130, 27);
         registrationForm.add(txtConfirmPassword);
         txtConfirmPassword.setColumns(10);
 
         setPasswordTextField = new JPasswordField();
         setPasswordTextField.setFont(textfieldFont);
         setPasswordTextField.setMargin(inset);
-        setPasswordTextField.setBounds(170, 333, 214, 27);
+        setPasswordTextField.setBounds(170, 388, 214, 27);
         registrationForm.add(setPasswordTextField);
 
         confirmPasswordTextField = new JPasswordField();
         confirmPasswordTextField.setFont(textfieldFont);
         confirmPasswordTextField.setMargin(inset);
-        confirmPasswordTextField.setBounds(170, 370, 214, 27);
+        confirmPasswordTextField.setBounds(170, 425, 214, 27);
         registrationForm.add(confirmPasswordTextField);
 
         setUsernameTextField = new JTextField();
         setUsernameTextField.setFont(textfieldFont);
         setUsernameTextField.setMargin(inset);
-        setUsernameTextField.setBounds(170, 296, 214, 27);
+        setUsernameTextField.setBounds(170, 351, 214, 27);
         registrationForm.add(setUsernameTextField);
         setUsernameTextField.setColumns(10);
 
@@ -238,28 +284,102 @@ public class RegisterPage extends JPanel implements ActionListener {
         hr.setBorder(BorderFactory.createEmptyBorder());
         hr.setBackground(registrationForm.getBackground());
         hr.setText("---------------------------------------------------------------------------------------------");
-        hr.setBounds(10, 271, 374, 11);
+        hr.setBounds(10, 326, 374, 11);
         registrationForm.add(hr);
         hr.setColumns(10);
+        
+        txtCardNo = new JTextField();
+        txtCardNo.setText("Card No");
+        txtCardNo.setFont(new Font("Dialog", Font.PLAIN, 16));
+        txtCardNo.setEditable(false);
+        txtCardNo.setColumns(10);
+        txtCardNo.setBorder(BorderFactory.createEmptyBorder());
+        txtCardNo.setBounds(10, 487, 96, 27);
+        registrationForm.add(txtCardNo);
+        
+        textcardNumber = new JTextField();
+        textcardNumber.setMargin(new Insets(3, 10, 0, 0));
+        textcardNumber.setFont(new Font("Consolas", Font.PLAIN, 16));
+        textcardNumber.setColumns(10);
+        textcardNumber.setBounds(116, 488, 214, 27);
+        registrationForm.add(textcardNumber);
+        
+        textField_2 = new JTextField();
+        textField_2.setText("---------------------------------------------------------------------------------------------");
+        textField_2.setColumns(10);
+        textField_2.setBorder(BorderFactory.createEmptyBorder());
+        textField_2.setBackground(SystemColor.menu);
+        textField_2.setBounds(10, 463, 374, 11);
+        registrationForm.add(textField_2);
+        
+        txtCardType = new JTextField();
+        txtCardType.setText("Card Type");
+        txtCardType.setFont(new Font("Dialog", Font.PLAIN, 16));
+        txtCardType.setEditable(false);
+        txtCardType.setColumns(10);
+        txtCardType.setBorder(BorderFactory.createEmptyBorder());
+        txtCardType.setBounds(10, 534, 96, 27);
+        registrationForm.add(txtCardType);
+        
+        textcardType = new JTextField();
+        textcardType.setMargin(new Insets(3, 10, 0, 0));
+        textcardType.setFont(new Font("Consolas", Font.PLAIN, 16));
+        textcardType.setColumns(10);
+        textcardType.setBounds(116, 535, 214, 27);
+        registrationForm.add(textcardType);
+        
+        txtPassportNo = new JTextField();
+        txtPassportNo.setText("Passport No. :");
+        txtPassportNo.setFont(new Font("Dialog", Font.PLAIN, 16));
+        txtPassportNo.setEditable(false);
+        txtPassportNo.setColumns(10);
+        txtPassportNo.setBorder(BorderFactory.createEmptyBorder());
+        txtPassportNo.setBounds(10, 283, 105, 27);
+        registrationForm.add(txtPassportNo);
+        
+        txtrPassportNo = new JTextField();
+        txtrPassportNo.setMargin(new Insets(3, 10, 0, 0));
+        txtrPassportNo.setFont(new Font("Consolas", Font.PLAIN, 16));
+        txtrPassportNo.setColumns(10);
+        txtrPassportNo.setBounds(126, 286, 214, 27);
+        registrationForm.add(txtrPassportNo);
+        
+        disabledComboBox = new JComboBox();
+        disabledComboBox.setModel(new DefaultComboBoxModel(new String[] {"NO", "YES"}));
+        disabledComboBox.setBounds(118, 157, 159, 22);
+        registrationForm.add(disabledComboBox);
 
         submitButton = new JButton("SUBMIT");
         submitButton.addActionListener(this);
         submitButton.setFocusPainted(false);
         submitButton.setFont(new Font("Tahoma", Font.PLAIN, 18));
-        submitButton.setBounds(359, 529, 106, 29);
+        submitButton.setBounds(359, 705, 106, 29);
         add(submitButton);
 
     }
 
     public void actionPerformed(ActionEvent e){
-        if(e.getSource()==disabledOptionNO){
-            disabledOptionYES.setSelected(false);
-        }else if(e.getSource()==disabledOptionYES){
-            disabledOptionNO.setSelected(false);
-        }else if(e.getSource()==submitButton){
-            if(firstNameTextField.getText().length()<10 || lastNameTextField.getText()==null || ageComboBox.getSelectedItem()==null || nationalityComboBox.getSelectedItem()==null || emailIDTextField.getText()==null||phoneNoTextField.getText()==null){
-                System.out.println("Enter every item!");
+        if(e.getSource()==submitButton){
+            if(firstNameTextField.getText().length()<10 || ageComboBox.getSelectedItem()==null || nationalityComboBox.getSelectedItem()==null || emailIDTextField.getText()==null||phoneNoTextField.getText()==null){
+            	txtEnterYourDetails.setText("Enter every item!");
             }
-        }else{}
+            else {
+            	String name = firstNameTextField.getText();
+            	String nat = nationalityComboBox.getSelectedItem().toString();
+            	String passport = txtPassportNo.getText();
+            	String emailID = emailIDTextField.getText();
+            	String phoneNo = phoneNoTextField.getText();
+            	String username = setUsernameTextField.getText();
+            	String password = String.copyValueOf(setPasswordTextField.getPassword());
+            	String cardno = textcardNumber.getText();
+            	String cardtype = textcardType.getText();
+            	int age = Integer.parseInt(ageComboBox.getSelectedItem().toString());
+            	int dis = (disabledComboBox.getSelectedItem().toString());
+            	
+            	
+            	Passenger_DetailsDB p = new Passenger_DetailsDB(name, nat, passport, emailID, phoneNo, username, password, cardno, cardtype, age, 0, );
+            	addPassengerDetails(null);
+            }
+        }
     }
 }
