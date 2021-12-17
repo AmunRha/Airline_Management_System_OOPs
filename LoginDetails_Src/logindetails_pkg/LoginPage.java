@@ -90,6 +90,9 @@ public class LoginPage extends JFrame {
         signin.setFocusPainted(false);
         signin.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+            	System.out.println("Login clicked");
+            	UserLoginPage u = new UserLoginPage();
+            	u.runUserLoginPage();
             }
         });
         signin.setFont(buttonFont);

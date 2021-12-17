@@ -59,11 +59,17 @@ public class UserLoginPage extends JFrame implements JDBC_Creds {
 					System.out.println("Value not in table");
 					return -3;
 				}
-				
-				Passenger_DetailsDB p = new Passenger_DetailsDB(rs.getString("Name"), rs.getString("Nationality"), rs.getString("PassportNo"), rs.getString("EmailID"),
-						rs.getString("PhoneNo"), rs.getString("Username"), rs.getString("password"), rs.getString("CardNumber"), rs.getString("CardType"),
-						rs.getInt("Age"), rs.getInt("IsAdmin"), rs.getInt("Disabled"));
-				if(pass.equals(p.getPassword())) {
+				st = connection.prepareStatement("SELECT * from Passenger_Details WHERE Username = ?");
+				st.setString(1, username);
+				rs = st.executeQuery();
+				Passenger_DetailsDB p = new Passenger_DetailsDB();
+				if(rs.next()) {
+					p = new Passenger_DetailsDB(rs.getString("Name"), rs.getString("Nationality"), rs.getString("PassportNo"), rs.getString("EmailID"),
+							rs.getString("PhoneNo"), rs.getString("Username"), rs.getString("password"), rs.getString("CardNumber"), rs.getString("CardType"),
+							rs.getInt("Age"), rs.getInt("IsAdmin"), rs.getInt("Disabled"));
+				}
+				System.out.println(pass + " " + p.getPassword());
+				if(!pass.equals(p.getPassword())) {
 					System.out.println("passowrd not matching");
 					return -4;
 				}
@@ -75,7 +81,6 @@ public class UserLoginPage extends JFrame implements JDBC_Creds {
 				System.out.println("Execution of Query Failed!");
 				e.printStackTrace();
 			}
-			System.out.println("Values inserted into the DB successfully!");
 			
 		}
 		catch (SQLException e) {
@@ -162,21 +167,26 @@ public class UserLoginPage extends JFrame implements JDBC_Creds {
         	public void actionPerformed(ActionEvent arg0) {
         		String username = usernameTextField.getText();
         		String pass = String.copyValueOf(passwordField.getPassword());
-        		int res = loginPage(username, pass);
-        		
-        		if (res == -3) {
-        			lblNewLabel.setText("Username does not exist!");
+        		if(username.length() == 0 || pass.length() == 0) {
+        			lblNewLabel.setText("Username or Pass should not be empty");
         		}
-        		else if(res == -4) {
-        			lblNewLabel.setText("Username and Password do not match");
-        		}
-        		else if(res == 100) {
-        			System.out.println("Admin Login");
-        			// AdminMainPage();
-        		}
-        		else if(res == 1) {
-        			System.out.println("Passenger Login");
-        			//PassengerMainPage();
+        		else {
+        			int res = loginPage(username, pass);
+            		
+            		if (res == -3) {
+            			lblNewLabel.setText("Username does not exist!");
+            		}
+            		else if(res == -4) {
+            			lblNewLabel.setText("Username and Password do not match");
+            		}
+            		else if(res == 100) {
+            			System.out.println("Admin Login");
+            			// AdminMainPage();
+            		}
+            		else if(res == 1) {
+            			System.out.println("Passenger Login");
+            			//PassengerMainPage();
+            		}
         		}
         	}
         });
