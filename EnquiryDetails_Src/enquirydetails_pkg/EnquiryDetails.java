@@ -29,12 +29,14 @@ import com.github.lgooddatepicker.components.TimePicker;
 import com.toedter.calendar.JDateChooser;
 
 import JDBCMisc_pkg.JDBC_Creds;
+import logindetails_pkg.Passenger_DetailsDB;
 import paymentdetails_pkg.PaymentPage;
 
 public class EnquiryDetails extends JFrame implements JDBC_Creds {
 
 	private JPanel contentPane;
 	private JTable table;
+	private Passenger_DetailsDB p;
 	
 	
 	private java.sql.Time getTime(String t){
@@ -149,11 +151,12 @@ public class EnquiryDetails extends JFrame implements JDBC_Creds {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public void runEnquiryDetails(Passenger_DetailsDB p1) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					EnquiryDetails frame = new EnquiryDetails();
+					p = new Passenger_DetailsDB(p1);
+					EnquiryDetails frame = new EnquiryDetails(p);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -162,7 +165,7 @@ public class EnquiryDetails extends JFrame implements JDBC_Creds {
 		});
 	}
 	
-	private int bookTicket(int id, JTable sTable) {
+	private int bookTicket(int id, JTable sTable, Passenger_DetailsDB p) {
 		
 		DefaultTableModel m = (DefaultTableModel)sTable.getModel();
 		
@@ -202,8 +205,9 @@ public class EnquiryDetails extends JFrame implements JDBC_Creds {
 		
 		
 		System.out.println("Moving to payment procedure");
-		PaymentPage p = new PaymentPage();
-		p.runPaymentPage(s);
+		PaymentPage pm = new PaymentPage();
+		System.out.println("Blah: " + p.getName());
+		pm.runPaymentPage(p, s);
 		
 		return 0;
 	}
@@ -211,8 +215,9 @@ public class EnquiryDetails extends JFrame implements JDBC_Creds {
 	/**
 	 * Create the frame.
 	 */
-	public EnquiryDetails() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	public EnquiryDetails() {}
+	public EnquiryDetails(Passenger_DetailsDB p) {
+		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 990, 618);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -315,7 +320,8 @@ public class EnquiryDetails extends JFrame implements JDBC_Creds {
 				}
 				else {
 					int id = Integer.parseInt(tid);
-					int res = bookTicket(id, table);
+					System.out.println("Blah: " + p.getName());
+					int res = bookTicket(id, table, p);
 					if(res == -1) {
 						lblResult.setText("Please check the schedule before booking");
 					}

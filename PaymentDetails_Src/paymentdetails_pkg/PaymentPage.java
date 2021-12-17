@@ -5,21 +5,26 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Locale;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.toedter.calendar.JDateChooser;
-
+import JDBCMisc_pkg.JDBC_Creds;
+import airlinedetails_pkg.Airline_DetailsDB;
+import airportdetails_pkg.Airport_DetailsDB;
 import enquirydetails_pkg.Schedule_DetailsDB;
+import logindetails_pkg.Passenger_DetailsDB;
 
-public class PaymentPage extends JFrame {
+public class PaymentPage extends JFrame implements JDBC_Creds{
     private ImageIcon image = new ImageIcon("weaccept.png");
     private JTextField txtPaymentPage;
     private JTextField txtCreditCardInfo;
@@ -45,14 +50,113 @@ public class PaymentPage extends JFrame {
     private JTextField lblPrice;
     private JTextField txtAirlineName;
     private JTextField lblAirline;
+    private Passenger_DetailsDB p;
+    private Airline_DetailsDB arln;
+    private Airport_DetailsDB arp;
 
     
-    public void runPaymentPage(Schedule_DetailsDB sch) {
+    private int setOtherDetails(Schedule_DetailsDB sch) {
+    	PreparedStatement st;
+		ResultSet rs;
+		System.out.println("Connecting to the DB!");
+		try(Connection connection = DriverManager.getConnection(url, user, password);){
+			if(connection != null) {
+				System.out.println("Connected to PostgreSQL!");
+			}
+			else {
+				System.out.println("Failed to connect to PostgreSQL");
+				System.out.println("Something went very wrong!");
+			}
+			
+			try {				
+				st = connection.prepareStatement("SELECT * from Airline_Details WHERE AirlineID = ?");
+				st.setInt(1, sch.getAirlineNo());
+				rs = st.executeQuery();
+				
+				if(rs.next()) {
+					arln = new Airline_DetailsDB(rs.getInt("AirlineID"), rs.getString("AirlineName"), rs.getString("AirlineType"), rs.getInt("SeatingCapacity"), rs.getFloat("Price"));
+				}
+				
+				st = connection.prepareStatement("SELECT * from Airport_Details WHERE AirportID = ?");
+				st.setInt(1, sch.getAirportID());
+				rs = st.executeQuery();
+				
+				if(rs.next()) {
+					arp = new Airport_DetailsDB(rs.getInt("AirportID"),  rs.getString("location"), rs.getString("AirportName"), rs.getInt("NoOfTerminals"));
+				}
+				
+				return 1;
+			}
+			catch (SQLException e) {
+				System.out.println("Execution of Query Failed!");
+				e.printStackTrace();
+			}
+			System.out.println("Values inserted into the DB successfully!");
+			
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}	
+		System.out.println("Connection to DB closed!");
+		return 0;
+    }
+    
+    private int addBookingDetails(Passenger_DetailsDB p, Schedule_DetailsDB s, Airline_DetailsDB arln, Airport_DetailsDB arp) {
+    	PreparedStatement st;
+		ResultSet rs;
+		int count = 0;
+		System.out.println("Connecting to the DB!");
+		try(Connection connection = DriverManager.getConnection(url, user, password);){
+			if(connection != null) {
+				System.out.println("Connected to PostgreSQL!");
+			}
+			else {
+				System.out.println("Failed to connect to PostgreSQL");
+				System.out.println("Something went very wrong!");
+			}
+			
+			try {
+				st = connection.prepareStatement("SELECT count(*) from bookings");
+				rs = st.executeQuery();
+				
+				if(rs.next()) {
+					count = rs.getInt(1);
+				}
+				
+				int ticketno = count+1;
+				
+				st = connection.prepareStatement("insert into bookings values (?, ?, ?, ?, ?, ?)");
+				st.setInt(1, ticketno);
+				st.setInt(2, arln.getAirlineNo());
+				st.setInt(3, arp.getAirportID());
+				st.setInt(4, s.getScheduleID());
+				st.setString(5, p.getPassportNo());
+				st.setDouble(6, arln.getPrice());
+				st.execute();
+			}
+			catch (SQLException e) {
+				System.out.println("Execution of Query Failed!");
+				e.printStackTrace();
+			}
+			System.out.println("Values inserted into the DB successfully!");
+			
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}	
+		System.out.println("Connection to DB closed!");
+		return 1;
+    }
+    
+    public void runPaymentPage(Passenger_DetailsDB p1, Schedule_DetailsDB sch) {
+    	System.out.println("Pppppp: " + sch.getDestination());
+		int res = this.setOtherDetails(sch);
+		System.out.println("AAAAAAA: " + arln.getAirlineName());
+		System.out.println("BBBBBBB: " + arp.getAirportName());
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					PaymentPage frame = new PaymentPage();
-					s = sch;
+					PaymentPage frame = new PaymentPage(p1, sch, arln, arp);
 					frame.setSize(800, 800);
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -65,8 +169,9 @@ public class PaymentPage extends JFrame {
     /**
      * Create the panel.
      */
+    public PaymentPage() {}
     
-    public PaymentPage() {
+    public PaymentPage(Passenger_DetailsDB p, Schedule_DetailsDB s, Airline_DetailsDB arln, Airport_DetailsDB arp) {
         getContentPane().setLayout(null);
         this.setBackground(Color.decode(pageThemeColor));
 
@@ -106,6 +211,7 @@ public class PaymentPage extends JFrame {
         lblCardNumber.setEditable(false);
         lblCardNumber.setColumns(10);
         lblCardNumber.setBounds(205, 94, 333, 29);
+        lblCardNumber.setText(p.getCardNumber());
         panel.add(lblCardNumber);
         
         lblCardType = new JTextField();
@@ -113,6 +219,7 @@ public class PaymentPage extends JFrame {
         lblCardType.setEditable(false);
         lblCardType.setColumns(10);
         lblCardType.setBounds(205, 136, 333, 29);
+        lblCardType.setText(p.getCardType());
         panel.add(lblCardType);
         
         txtPassengerName = new JTextField();
@@ -128,6 +235,7 @@ public class PaymentPage extends JFrame {
         lblPassengerName.setEditable(false);
         lblPassengerName.setColumns(10);
         lblPassengerName.setBounds(205, 10, 333, 29);
+        lblPassengerName.setText(p.getName());
         panel.add(lblPassengerName);
         
         txtPassportNo = new JTextField();
@@ -143,6 +251,7 @@ public class PaymentPage extends JFrame {
         lblPassportNo.setEditable(false);
         lblPassportNo.setColumns(10);
         lblPassportNo.setBounds(205, 52, 333, 29);
+        lblPassportNo.setText(p.getPassportNo());
         panel.add(lblPassportNo);
         
         txtDestination = new JTextField();
@@ -158,6 +267,7 @@ public class PaymentPage extends JFrame {
         lblDestination.setEditable(false);
         lblDestination.setColumns(10);
         lblDestination.setBounds(205, 178, 333, 29);
+        lblDestination.setText(s.getDestination());
         panel.add(lblDestination);
         
         txtAirportName = new JTextField();
@@ -173,6 +283,7 @@ public class PaymentPage extends JFrame {
         lblAirportName.setEditable(false);
         lblAirportName.setColumns(10);
         lblAirportName.setBounds(205, 220, 333, 29);
+        lblAirportName.setText(arp.getAirportName());
         panel.add(lblAirportName);
         
         txtDateOfDeparture = new JTextField();
@@ -188,6 +299,7 @@ public class PaymentPage extends JFrame {
         lblDate.setEditable(false);
         lblDate.setColumns(10);
         lblDate.setBounds(205, 262, 333, 29);
+        lblDate.setText(s.getDateofdeparture());
         panel.add(lblDate);
         
         txtTimeOfDeparture = new JTextField();
@@ -203,6 +315,7 @@ public class PaymentPage extends JFrame {
         lblTime.setEditable(false);
         lblTime.setColumns(10);
         lblTime.setBounds(205, 304, 333, 29);
+        lblTime.setText(s.getTimeofdeparture());
         panel.add(lblTime);
         
         txtTotalPrice = new JTextField();
@@ -218,6 +331,7 @@ public class PaymentPage extends JFrame {
         lblPrice.setEditable(false);
         lblPrice.setColumns(10);
         lblPrice.setBounds(205, 388, 333, 29);
+        lblPrice.setText(String.format("%f", arln.getPrice()));
         panel.add(lblPrice);
         
         txtAirlineName = new JTextField();
@@ -233,6 +347,7 @@ public class PaymentPage extends JFrame {
         lblAirline.setEditable(false);
         lblAirline.setColumns(10);
         lblAirline.setBounds(205, 346, 333, 29);
+        lblAirline.setText(arln.getAirlineName());
         panel.add(lblAirline);
 
         txtCreditCardInfo = new JTextField();
@@ -247,6 +362,8 @@ public class PaymentPage extends JFrame {
                 getContentPane().add(ConfirmButton);
                 ConfirmButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                    	System.out.println("Confirmed payment, adding to database");
+                    	int res = addBookingDetails(p, s, arln, arp);
                     }
                 });
                 ConfirmButton.setFont(new Font("Bahnschrift", Font.PLAIN, 15));

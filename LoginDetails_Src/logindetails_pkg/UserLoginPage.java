@@ -15,13 +15,14 @@ import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import JDBCMisc_pkg.JDBC_Creds;
-import javax.swing.JLabel;
+import passengermainpage_pkg.PassengerMainPage;
 
 public class UserLoginPage extends JFrame implements JDBC_Creds {
     private JTextField txtPassengerLoginPage;
@@ -31,6 +32,7 @@ public class UserLoginPage extends JFrame implements JDBC_Creds {
     private JPasswordField passwordField;
     private String pageThemeColor = "#7CD1B8";
     private JButton loginButton;
+    private Passenger_DetailsDB p;
     
     
     private int loginPage(String username, String pass) {
@@ -62,7 +64,7 @@ public class UserLoginPage extends JFrame implements JDBC_Creds {
 				st = connection.prepareStatement("SELECT * from Passenger_Details WHERE Username = ?");
 				st.setString(1, username);
 				rs = st.executeQuery();
-				Passenger_DetailsDB p = new Passenger_DetailsDB();
+				p = new Passenger_DetailsDB();
 				if(rs.next()) {
 					p = new Passenger_DetailsDB(rs.getString("Name"), rs.getString("Nationality"), rs.getString("PassportNo"), rs.getString("EmailID"),
 							rs.getString("PhoneNo"), rs.getString("Username"), rs.getString("password"), rs.getString("CardNumber"), rs.getString("CardType"),
@@ -185,7 +187,8 @@ public class UserLoginPage extends JFrame implements JDBC_Creds {
             		}
             		else if(res == 1) {
             			System.out.println("Passenger Login");
-            			//PassengerMainPage();
+            			PassengerMainPage pm = new PassengerMainPage();
+            			pm.runPassengerMainPage(p);
             		}
         		}
         	}
