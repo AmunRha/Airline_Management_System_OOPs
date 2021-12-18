@@ -51,6 +51,12 @@ public class PassengerMainPage extends JFrame {
 		contentPane.setLayout(null);
 		
 		JButton btnNewButton = new JButton("Show My Tickets");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ShowTicketPage sh = new ShowTicketPage();
+				sh.runShowTicketPage(p);
+			}
+		});
 		btnNewButton.setBounds(225, 245, 204, 42);
 		contentPane.add(btnNewButton);
 		

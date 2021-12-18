@@ -172,7 +172,7 @@ public class PaymentPage extends JFrame implements JDBC_Creds{
     public PaymentPage() {}
     
     public PaymentPage(Passenger_DetailsDB p, Schedule_DetailsDB s, Airline_DetailsDB arln, Airport_DetailsDB arp) {
-        getContentPane().setLayout(null);
+     	getContentPane().setLayout(null);
         this.setBackground(Color.decode(pageThemeColor));
 
         txtPaymentPage = new JTextField();
@@ -353,7 +353,7 @@ public class PaymentPage extends JFrame implements JDBC_Creds{
         txtCreditCardInfo = new JTextField();
         txtCreditCardInfo.setFont(new Font("Bahnschrift", Font.PLAIN, 16));
         txtCreditCardInfo.setText("Confirm payment:");
-        txtCreditCardInfo.setBounds(100, 100, 194, 40);
+        txtCreditCardInfo.setBounds(100, 100, 550, 40);
         getContentPane().add(txtCreditCardInfo);
         txtCreditCardInfo.setColumns(10);
         
@@ -364,6 +364,8 @@ public class PaymentPage extends JFrame implements JDBC_Creds{
                     public void actionPerformed(ActionEvent e) {
                     	System.out.println("Confirmed payment, adding to database");
                     	int res = addBookingDetails(p, s, arln, arp);
+                    	txtCreditCardInfo.setText("Ticket Confirmed Succefully, you may close this now");
+                    	remove(ConfirmButton);
                     }
                 });
                 ConfirmButton.setFont(new Font("Bahnschrift", Font.PLAIN, 15));
