@@ -123,7 +123,7 @@ public class PaymentPage extends JFrame implements JDBC_Creds{
 					count = rs.getInt(1);
 				}
 				
-				int ticketno = count+1;
+				int ticketno = count+10;
 				
 				st = connection.prepareStatement("insert into bookings values (?, ?, ?, ?, ?, ?)");
 				st.setInt(1, ticketno);
